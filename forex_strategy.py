@@ -110,7 +110,12 @@ class ForexSessionManager:
         
         # Проверка ±30 минут от времени новостей
         for news_time in news_times:
+            # Ensure news_datetime is offset-aware, like current_time
             news_datetime = datetime.combine(current_time.date(), news_time)
+            if current_time.tzinfo is not None:
+                news_datetime = current_time.tzinfo.localize(news_datetime)
+            # If current_time was naive (though the default is UTC), news_datetime remains naive, which is consistent.
+
             time_diff = abs((current_time - news_datetime).total_seconds())
             if time_diff <= 1800:  # 30 минут
                 return True
